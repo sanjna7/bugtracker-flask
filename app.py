@@ -17,6 +17,7 @@ def init_db():
                   created_at TEXT)''')
     conn.commit()
     conn.close()
+init_db()
 
 # HTML template embedded so it's 1 file only
 HTML = '''
@@ -98,7 +99,7 @@ def home():
 def get_bugs():
     q = request.args.get('q', '')
     status = request.args.get('status', '')
-    conn = sqlite3.connect('bugs.db')
+    conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     query = "SELECT * FROM bugs WHERE 1=1"
     params = []
@@ -119,7 +120,7 @@ def add_bug():
     data = request.json
     if not data.get('title'):
         return jsonify({'error':'Title required'}), 400
-    conn = sqlite3.connect('bugs.db')
+    conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("INSERT INTO bugs (title, description, priority, created_at) VALUES (?,?,?,?)",
               (data['title'], data.get('description',''), data.get('priority','Medium'), datetime.now().strftime('%Y-%m-%d %H:%M')))
@@ -131,7 +132,7 @@ def add_bug():
 @app.route('/api/bugs/<int:bug_id>', methods=['PUT'])
 def update_bug(bug_id):
     data = request.json
-    conn = sqlite3.connect('bugs.db')
+    conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("UPDATE bugs SET status=? WHERE id=?", (data['status'], bug_id))
     conn.commit()
@@ -140,7 +141,7 @@ def update_bug(bug_id):
 
 @app.route('/api/bugs/<int:bug_id>', methods=['DELETE'])
 def delete_bug(bug_id):
-    conn = sqlite3.connect('bugs.db')
+    conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM bugs WHERE id=?", (bug_id,))
     conn.commit()
