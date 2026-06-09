@@ -4,9 +4,9 @@ import os
 from datetime import datetime
 
 app = Flask(__name__)
-
+DATABASE='/tmp/bugs.db'
 def init_db():
-    conn = sqlite3.connect('bugs.db')
+    conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS bugs
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
