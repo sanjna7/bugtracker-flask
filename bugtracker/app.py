@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify, render_template_string
 import sqlite3
-import os
 from datetime import datetime
 
 app = Flask(__name__)
-DATABASE='bugs.db'
+
 def init_db():
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('bugs.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS bugs
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +16,6 @@ def init_db():
                   created_at TEXT)''')
     conn.commit()
     conn.close()
-
 
 # HTML template embedded so it's 1 file only
 HTML = '''
@@ -99,7 +97,7 @@ def home():
 def get_bugs():
     q = request.args.get('q', '')
     status = request.args.get('status', '')
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('bugs.db')
     c = conn.cursor()
     query = "SELECT * FROM bugs WHERE 1=1"
     params = []
@@ -120,7 +118,7 @@ def add_bug():
     data = request.json
     if not data.get('title'):
         return jsonify({'error':'Title required'}), 400
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('bugs.db')
     c = conn.cursor()
     c.execute("INSERT INTO bugs (title, description, priority, created_at) VALUES (?,?,?,?)",
               (data['title'], data.get('description',''), data.get('priority','Medium'), datetime.now().strftime('%Y-%m-%d %H:%M')))
@@ -132,7 +130,7 @@ def add_bug():
 @app.route('/api/bugs/<int:bug_id>', methods=['PUT'])
 def update_bug(bug_id):
     data = request.json
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('bugs.db')
     c = conn.cursor()
     c.execute("UPDATE bugs SET status=? WHERE id=?", (data['status'], bug_id))
     conn.commit()
@@ -141,7 +139,7 @@ def update_bug(bug_id):
 
 @app.route('/api/bugs/<int:bug_id>', methods=['DELETE'])
 def delete_bug(bug_id):
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect('bugs.db')
     c = conn.cursor()
     c.execute("DELETE FROM bugs WHERE id=?", (bug_id,))
     conn.commit()
@@ -149,6 +147,9 @@ def delete_bug(bug_id):
     return jsonify({'success':True})
 
 if __name__ == '__main__':
-    port=int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    init_db()  
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+
     
