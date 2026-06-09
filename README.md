@@ -1,5 +1,4 @@
-﻿# BugTracker - Flask + SQLite CRUD App
- # Accenture BugTracker - Flask CRUD App
+#BugTracker - Flask CRUD App
 
 Live Demo: https://bugtracker-flask.onrender.com
 
