@@ -1,34 +1,26 @@
-# Bug Tracking & Analytics System | Python Flask SQL
+# 🐞 BugTracker - Flask Web App
 
-Live Demo: https://bugtracker-flask.onrender.com
-GitHub: https://github.com/sanjna7/bugtracker-flask
-Tech: Python, Flask, SQL, MySQL, SQLite, REST API
+A simple and lightweight Bug Tracking System built with Python Flask.
 
-## About
-Full-stack Bug Tracker with Analytics Dashboard. Combines 3 projects: BugTracker + Student Mark Analyser + Performance Prediction.
+**GitHub:** https://github.com/sanjna7/bugtracker-flask  
+**Author:** sanjna7
 
-## Features
-- CRUD with Python Flask and SQL
-- Analytics Dashboard at /analytics
-- SQL Queries: GROUP BY, COUNT, JOIN ready
-- Data Analysis for bug reports
+### ✨ Features
+- Add New Bugs with Title, Description, Comment, Assigned To, Severity
+- View All Bugs with Open/Closed Status
+- Filter Critical Bugs (High Severity + Open) - `/critical`
+- Filter Bugs by User - `/user/sanjna7`
+- Close Bugs - `/close/<id>`
+- Bug Counter - Total / Open / Closed
 
-## SQL Queries Used
-SELECT status, COUNT(*) as count FROM bugs GROUP BY status;
-SELECT priority, COUNT(*) as count FROM bugs GROUP BY priority;
-SELECT COUNT(*) as total FROM bugs;
+### 🛠️ Tech Stack
+- **Backend:** Python, Flask
+- **Frontend:** HTML, Jinja2 Templates
+- **Tools:** Git, GitHub, VS Code
 
-## Tech Stack
-Python, Flask, SQL, MySQL, SQLite, HTML, Git, Pandas
+### 🚀 How to Run Locally
 
-## Run
-pip install -r requirements.txt
-python app.py
-
-## For Dubai Recruiters
-Role: Junior Python Developer | SQL Developer | Odoo Developer
-Location: Ready to Relocate to Dubai UAE
-Visa: Passport Ready
-Skills: Python, Flask, SQL, MySQL
-
-Contact: Bangalore | Python SQL Developer
+1. Clone the repo
+```bash
+git clone https://github.com/sanjna7/bugtracker-flask.git
+cd bugtracker-flask
