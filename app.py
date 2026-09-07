@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 
 app = Flask(__name__)
-DATABASE='bugs.db'
+DATABASE = 'bugs.db'
 
 def init_db():
     conn = sqlite3.connect(DATABASE)
@@ -21,15 +21,14 @@ def init_db():
 
 init_db()
 
-# HTML template embedded so it's 1 file only
 HTML = '''
 <!DOCTYPE html>
 <html>
 <head><title>BugTracker</title>
 <style>
 body{font-family:Arial; margin:20px; padding:20px} table{border-collapse:collapse; width:100%}
-td,th{border:1px solid #ddd; padding:8px}.Open{background:#ffebee}.InProgress{background:#fff9c4}
-input,select,textarea{margin:5px; padding:5px} button{padding:5px 12px; margin:5px}
+td,th{border:1px solid #ddd; padding:8px}.Open{background:#ffebee}.InProgress{background:#fff9c4}.Closed{background:#e8f5e9}
+input,select,textarea{margin:5px; padding:8px} button{padding:5px 12px; margin:2px; cursor:pointer}
 </style>
 </head>
 <body>
@@ -43,7 +42,7 @@ input,select,textarea{margin:5px; padding:5px} button{padding:5px 12px; margin:5
 <br>
 <input id="search" placeholder="Search bugs..." onkeyup="loadBugs()">
 <select id="filterStatus" onchange="loadBugs()">
-<option value="">All Status</option><option value="Open">Open</option><option value="InProgress">InProgress</option><option value="Closed">Closed</option>
+<option value="">All Status</option><option>Open</option><option>InProgress</option><option>Closed</option>
 </select>
 <table id="bugTable"><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Priority</th><th>Created</th><th>Action</th></tr></thead><tbody></tbody></table>
 <script>
@@ -55,35 +54,21 @@ async function loadBugs(){
  let tbody = document.querySelector("#bugTable tbody")
  tbody.innerHTML = ''
  bugs.forEach(b => {
-  tbody.innerHTML += `<tr class="${b.status}">
-   <td>${b.id}</td><td>${b.title}</td><td>${b.status}</td><td>${b.priority}</td>
-   <td>${b.created_at}</td>
-   <td>
-   <button onclick="updateStatus(${b.id}, 'InProgress')">Start</button>
-   <button onclick="updateStatus(${b.id}, 'Closed')">Close</button>
-   <button onclick="deleteBug(${b.id})">Delete</button>
-   </td></tr>`
+  tbody.innerHTML += `<tr class="${b.status}"><td>${b.id}</td><td>${b.title}</td><td>${b.status}</td><td>${b.priority}</td><td>${b.created_at}</td><td><button onclick="updateStatus(${b.id}, 'InProgress')">Start</button><button onclick="updateStatus(${b.id}, 'Closed')">Close</button><button onclick="deleteBug(${b.id})">Delete</button></td></tr>`
  })
 }
-
 async function updateStatus(id, status){
- await fetch(`/api/bugs/${id}`, {method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status})})
+ await fetch(`/api/bugs/${id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status})})
  loadBugs()
 }
-
 async function deleteBug(id){
  await fetch(`/api/bugs/${id}`, {method:'DELETE'})
  loadBugs()
 }
-
 document.getElementById('bugForm').onsubmit = async (e) => {
  e.preventDefault()
- let data = {
-  title: document.getElementById('title').value,
-  description: document.getElementById('desc').value,
-  priority: document.getElementById('priority').value
- }
- await fetch('/api/bugs', {method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(data)})
+ let data = {title: document.getElementById('title').value, description: document.getElementById('desc').value, priority: document.getElementById('priority').value}
+ await fetch('/api/bugs', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)})
  e.target.reset()
  loadBugs()
 }
@@ -112,7 +97,8 @@ def get_bugs():
         params.append(status)
     query += " ORDER BY id DESC"
     c.execute(query, params)
-    bugs = [{'id':r[0],'title':r[1],'description':r[2],'status':r[3],'priority':r[4],'created_at':r[5]} for r in c.fetchall()]
+    rows = c.fetchall()
+    bugs = [{'id':r[0],'title':r[1],'description':r[2],'status':r[3],'priority':r[4],'created_at':r[5]} for r in rows]
     conn.close()
     return jsonify(bugs)
 
@@ -131,7 +117,7 @@ def add_bug():
     return jsonify({'id':bug_id}), 201
 
 @app.route('/api/bugs/<int:bug_id>', methods=['PUT'])
-def update_bug_id(bug_id):
+def update_bug(bug_id):
     data = request.json
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
@@ -141,7 +127,7 @@ def update_bug_id(bug_id):
     return jsonify({'success':True})
 
 @app.route('/api/bugs/<int:bug_id>', methods=['DELETE'])
-def delete_bug_id(bug_id):
+def delete_bug(bug_id):
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute("DELETE FROM bugs WHERE id=?", (bug_id,))
