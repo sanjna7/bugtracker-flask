@@ -18,6 +18,7 @@ def init_db():
                   created_at TEXT)''')
     conn.commit()
     conn.close()
+init_db()
 
 # HTML template embedded so it's 1 file only
 HTML = '''
